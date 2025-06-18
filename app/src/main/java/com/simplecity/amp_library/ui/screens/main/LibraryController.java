@@ -99,16 +99,7 @@ public class LibraryController extends BaseFragment implements
     AppBarLayout appBarLayout;
 
     @Inject
-    NavigationEventRelay navigationEventRelay;
-
-    @Inject
     SettingsManager settingsManager;
-
-    @Inject
-    MultiSheetEventRelay multiSheetEventRelay;
-
-    @Inject
-    AnalyticsManager analyticsManager;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -121,10 +112,11 @@ public class LibraryController extends BaseFragment implements
     private PagerAdapter pagerAdapter;
 
     public static FragmentInfo fragmentInfo() {
-        return new FragmentInfo(LibraryController.class, null, "LibraryController");
+        return new FragmentInfo(LibraryController.class, null, TAG);
     }
 
     public LibraryController() {
+        // Required empty public constructor
     }
 
     @Override
@@ -205,10 +197,9 @@ public class LibraryController extends BaseFragment implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                openSearch();
-                return true;
+        if (item.getItemId() == R.id.action_search) {
+            openSearch();
+            return true;
         }
         return false;
     }
@@ -291,7 +282,6 @@ public class LibraryController extends BaseFragment implements
         if (transitionView != null) {
             String transitionName = ViewCompat.getTransitionName(transitionView);
             transitions.add(new Pair<>(transitionView, transitionName));
-            //            transitions.add(new Pair<>(toolbar, "toolbar"));
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 Transition moveTransition = TransitionInflater.from(getContext()).inflateTransition(R.transition.image_transition);
@@ -305,7 +295,7 @@ public class LibraryController extends BaseFragment implements
 
     @Override
     protected String screenName() {
-        return "LibraryController";
+        return TAG;
     }
 
     @Override

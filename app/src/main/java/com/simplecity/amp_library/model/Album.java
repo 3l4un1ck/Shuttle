@@ -22,22 +22,19 @@ public class Album implements
         Comparable<Album>,
         Sortable {
 
-    public long id;
-    public String name;
+    private long id;
+    private String name;
 
-    public List<Artist> artists = new ArrayList<>();
-    public String albumArtistName;
+    private List<Artist> artists = new ArrayList<>();
+    private String albumArtistName;
 
-    public int year;
-    public int numSongs;
-    public int numDiscs;
+    private int year;
+    private int numSongs;
 
-    public long lastPlayed;
-    public long dateAdded;
+    private long lastPlayed;
+    private long dateAdded;
 
-    public List<String> paths = new ArrayList<>();
-
-    public int songPlayCount;
+    private List<String> paths = new ArrayList<>();
 
     private String artworkKey;
 
@@ -212,8 +209,8 @@ public class Album implements
     public String getRemoteArtworkUrl() {
         try {
             return "https://artwork.shuttlemusicplayer.app/api/v1/artwork"
-                    + "?artist=" + URLEncoder.encode(albumArtistName, Charset.forName("UTF-8").name())
-                    + "&album=" + URLEncoder.encode(name, Charset.forName("UTF-8").name());
+                    + "?artist=" + URLEncoder.encode(albumArtistName, StandardCharsets.UTF_8.name())
+                    + "&album=" + URLEncoder.encode(name, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             return null;
         }
