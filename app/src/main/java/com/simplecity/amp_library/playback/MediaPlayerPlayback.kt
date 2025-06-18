@@ -32,9 +32,8 @@ internal class MediaPlayerPlayback(context: Context) : LocalPlayback(context), M
         get() = synchronized(this) {
             if (!isInitialized || isFadingDown) {
                 return false
-            } else {
-                return currentMediaPlayer?.isPlaying ?: false || isFadingUp
             }
+            return currentMediaPlayer?.isPlaying ?: false || isFadingUp
         }
 
     override val duration: Long
@@ -276,8 +275,6 @@ internal class MediaPlayerPlayback(context: Context) : LocalPlayback(context), M
                 callbacks?.onError(this, "Server died")
                 return true
             }
-            else -> {
-            }
         }
 
         callbacks?.onError(this, "Unknown error")
@@ -296,7 +293,7 @@ internal class MediaPlayerPlayback(context: Context) : LocalPlayback(context), M
     }
 
     override fun updateLastKnownStreamPosition() {
-
+        // This method is not applicable for MediaPlayerPlayback, as it does not support streaming.
     }
 
     private fun createMediaPlayer(context: Context): MediaPlayer {

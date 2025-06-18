@@ -24,9 +24,9 @@ public class AlbumArtist implements
         ArtworkProvider,
         Sortable {
 
-    public String name;
+    private String name;
 
-    public List<Album> albums = new ArrayList<>();
+    private List<Album> albums = new ArrayList<>();
 
     private String sortKey;
 
@@ -127,7 +127,7 @@ public class AlbumArtist implements
     @Override
     public String getRemoteArtworkUrl() {
         try {
-            return "https://artwork.shuttlemusicplayer.app/api/v1/artwork?artist=" + URLEncoder.encode(name, Charset.forName("UTF-8").name());
+            return "https://artwork.shuttlemusicplayer.app/api/v1/artwork?artist=" + URLEncoder.encode(name, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             return null;
         }
