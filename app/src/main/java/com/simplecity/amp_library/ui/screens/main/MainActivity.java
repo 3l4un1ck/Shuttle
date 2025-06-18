@@ -60,8 +60,6 @@ public class MainActivity extends BaseActivity implements
 
     private DrawerLayout drawerLayout;
 
-    private View navigationView;
-
     private boolean hasPendingPlaybackRequest;
 
     @Inject
@@ -85,6 +83,8 @@ public class MainActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
 
         analyticsManager.dropBreadcrumb(TAG, "onCreate()");
+
+        View navigationView = findViewById(R.id.navView);
 
         // If we haven't set any defaults, do that now
         if (Aesthetic.isFirstTime(this)) {
@@ -221,14 +221,14 @@ public class MainActivity extends BaseActivity implements
             if (id >= 0) {
                 Query query = Playlist.getQuery();
                 query.uri = ContentUris.withAppendedId(query.uri, id);
-                SqlBriteUtils.createSingle(this, (cursor) -> new Playlist(this, cursor), query, null)
+                SqlBriteUtils.createSingle(this, cursor -> new Playlist(this, cursor), query, null)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 playlist -> {
                                     mediaManager.playAll(songsRepository.getSongs(playlist).first(new ArrayList<>()),
                                             () -> {
-                                                // Todo: Show playback failure toast
+                                                Toast.makeText(getContext(), R.string.playback_failed, Toast.LENGTH_SHORT).show();
                                                 return Unit.INSTANCE;
                                             });
                                     // Make sure to process intent only once
@@ -263,10 +263,10 @@ public class MainActivity extends BaseActivity implements
         // If we've stored a version code in the past, and it's lower than the current version code,
         // we can show the changelog.
         // Don't show the changelog for first time users.
-        if (storedVersionCode != -1 && storedVersionCode < BuildConfig.VERSION_CODE) {
-            if (settingsManager.getShowChangelogOnLaunch()) {
-                ChangelogDialog.Companion.newInstance().show(getSupportFragmentManager());
-            }
+        if (storedVersionCode != -1
+                && storedVersionCode < BuildConfig.VERSION_CODE
+                && settingsManager.getShowChangelogOnLaunch()) {
+            ChangelogDialog.Companion.newInstance().show(getSupportFragmentManager());
         }
         settingsManager.setVersionCode();
     }
@@ -317,7 +317,7 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     protected String screenName() {
-        return "MainActivity";
+        return TAG;
     }
 
     @Override

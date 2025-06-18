@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.simplecity.amp_library">
+          package="com.simplecity.amp_library" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.android.com/apk/res/android ">
 
     <!-- ## 'Protection-Normal' permissions ## -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -162,7 +162,8 @@
             android:name=".services.DashClockService"
             android:icon="@drawable/ic_headphones_white"
             android:label="@string/app_name"
-            android:permission="com.google.android.apps.dashclock.permission.READ_EXTENSION_DATA">
+            android:permission="com.google.android.apps.dashclock.permission.READ_EXTENSION_DATA"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.apps.dashclock.Extension"/>
             </intent-filter>
@@ -179,7 +180,8 @@
             android:name=".services.ArtworkDownloadService"
             android:label="@string/download_service"/>
 
-        <receiver android:name="com.simplecity.amp_library.utils.MediaButtonIntentReceiver">
+        <receiver android:name="com.simplecity.amp_library.utils.MediaButtonIntentReceiver"
+                  android:exported="true">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MEDIA_BUTTON"
@@ -194,7 +196,8 @@
         <!-- Config Activity for medium Widget -->
         <activity
             android:name=".ui.widgets.WidgetConfigureActivityMedium"
-            android:theme="@style/WallpaperTheme">
+            android:theme="@style/WallpaperTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
@@ -203,7 +206,8 @@
         <!-- Config Activity for extra large Widget -->
         <activity
             android:name=".ui.widgets.WidgetConfigureActivityExtraLarge"
-            android:theme="@style/WallpaperTheme">
+            android:theme="@style/WallpaperTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
@@ -212,7 +216,8 @@
         <!-- Broadcast Receiver for medium Widget -->
         <receiver
             android:name=".ui.widgets.WidgetProviderMedium"
-            android:label="Shuttle 4x1">
+            android:label="Shuttle 4x1"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -222,10 +227,11 @@
                 android:resource="@xml/widget_provider_medium"/>
         </receiver>
 
-        <!-- Config Activity for small Widget -->
+        <!-- Config Activity for a small Widget -->
         <activity
             android:name=".ui.widgets.WidgetConfigureActivitySmall"
-            android:theme="@style/WallpaperTheme">
+            android:theme="@style/WallpaperTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
@@ -234,7 +240,8 @@
         <!-- Broadcast Receiver for small Widget -->
         <receiver
             android:name=".ui.widgets.WidgetProviderSmall"
-            android:label="Shuttle 2x1">
+            android:label="Shuttle 2x1"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -244,10 +251,11 @@
                 android:resource="@xml/widget_provider_small"/>
         </receiver>
 
-        <!-- Config Activity for large Widget -->
+        <!-- Config Activity for a large Widget -->
         <activity
             android:name=".ui.widgets.WidgetConfigureActivityLarge"
-            android:theme="@style/WallpaperTheme">
+            android:theme="@style/WallpaperTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
@@ -260,7 +268,8 @@
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.NoActionBar.FullScreen">
+            android:theme="@style/Theme.AppCompat.NoActionBar.FullScreen"
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="com.lge.quickcover"/>
@@ -273,7 +282,8 @@
         <!-- Broadcast Receiver for large Widget -->
         <receiver
             android:name=".ui.widgets.WidgetProviderLarge"
-            android:label="Shuttle 4x2">
+            android:label="Shuttle 4x2"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -286,7 +296,8 @@
         <!-- Broadcast Receiver for extra large Widget -->
         <receiver
             android:name=".ui.widgets.WidgetProviderExtraLarge"
-            android:label="Shuttle 4x4">
+            android:label="Shuttle 4x4"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -330,11 +341,11 @@
             android:resource="@drawable/ic_stat_notification"/>
         <meta-data
             android:name="com.google.android.gms.car.application.theme"
-            android:resource="@style/CarTheme" />
+            android:resource="@style/CarTheme"/>
 
         <!-- ChromeCast -->
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="com.simplecity.amp_library.cast.CastOptionsProvider" />
+            android:value="com.simplecity.amp_library.cast.CastOptionsProvider"/>
     </application>
 </manifest>

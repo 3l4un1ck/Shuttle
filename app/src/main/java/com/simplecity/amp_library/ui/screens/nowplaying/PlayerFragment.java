@@ -180,6 +180,7 @@ public class PlayerFragment extends BaseFragment implements
     private ValueAnimator colorAnimator;
 
     public PlayerFragment() {
+        // Required empty public constructor
     }
 
     public static PlayerFragment newInstance() {
@@ -298,7 +299,7 @@ public class PlayerFragment extends BaseFragment implements
 
         if (!settingsManager.getUsePalette() && !settingsManager.getUsePaletteNowPlayingOnly()) {
             disposables.add(getAestheticColorSetDisposable().subscribe(
-                    colorSet -> animateColors(PlayerFragment.this.colorSet, colorSet, 800, this::invalidateColors, null),
+                    animatecolorSet -> animateColors(PlayerFragment.this.animatecolorSet, animatecolorSet, 800, this::invalidateColors, null),
                     error -> {
                         // Nothing to do
                     })
@@ -403,7 +404,7 @@ public class PlayerFragment extends BaseFragment implements
 
     @Override
     public void queueChanged(int queuePosition, int queueLength) {
-
+        // This is not supported in the player screen, so we do nothing.
     }
 
     @Override
@@ -461,11 +462,10 @@ public class PlayerFragment extends BaseFragment implements
         }
 
         String totalTimeString = StringUtils.makeTimeString(getContext(), song.duration / 1000);
-        if (!TextUtils.isEmpty(totalTimeString)) {
-            if (totalTime != null) {
-                totalTime.setText(totalTimeString);
-            }
+        if (!TextUtils.isEmpty(totalTimeString) && totalTime != null) {
+            totalTime.setText(totalTimeString);
         }
+
 
         if (track != null) {
             track.setText(song.name);
@@ -516,64 +516,66 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     void invalidateColors(ColorSet colorSet) {
-
         boolean ignorePalette = false;
         if (!settingsManager.getUsePalette() && !settingsManager.getUsePaletteNowPlayingOnly()) {
-            // If we're not using Palette at all, use non-tinted colors for text.
             colorSet.setPrimaryTextColorTinted(colorSet.getPrimaryTextColor());
             colorSet.setSecondaryTextColorTinted(colorSet.getSecondaryTextColor());
             ignorePalette = true;
         }
 
-        if (!isLandscape && backgroundView != null) {
-            backgroundView.setBackgroundColor(colorSet.getPrimaryColor());
-        }
+        updateLandscapeColors(colorSet);
+        updateTextColors(colorSet);
+        updateButtonColors(colorSet, ignorePalette);
 
-        if (!isLandscape && currentTime != null) {
-            currentTime.setTextColor(colorSet.getPrimaryTextColor());
-        }
+        this.colorSet = colorSet;
+    }
 
-        if (!isLandscape && totalTime != null) {
-            totalTime.setTextColor(colorSet.getPrimaryTextColor());
+    private void updateLandscapeColors(ColorSet colorSet) {
+        if (!isLandscape) {
+            if (backgroundView != null) {
+                backgroundView.setBackgroundColor(colorSet.getPrimaryColor());
+            }
+            if (currentTime != null) {
+                currentTime.setTextColor(colorSet.getPrimaryTextColor());
+            }
+            if (totalTime != null) {
+                totalTime.setTextColor(colorSet.getPrimaryTextColor());
+            }
         }
+    }
 
+    private void updateTextColors(ColorSet colorSet) {
         if (track != null) {
             track.setTextColor(colorSet.getPrimaryTextColorTinted());
         }
-
         if (album != null) {
             album.setTextColor(colorSet.getSecondaryTextColorTinted());
         }
-
         if (artist != null) {
             artist.setTextColor(colorSet.getSecondaryTextColorTinted());
         }
+    }
 
+    private void updateButtonColors(ColorSet colorSet, boolean ignorePalette) {
         if (seekBar != null) {
-            seekBar.invalidateColors(new ColorIsDarkState(ignorePalette ? colorSet.getAccentColor() : colorSet.getPrimaryTextColorTinted(), false));
+            seekBar.invalidateColors(new ColorIsDarkState(
+                ignorePalette ? colorSet.getAccentColor() : colorSet.getPrimaryTextColorTinted(), false));
         }
-
         if (shuffleButton != null) {
             shuffleButton.invalidateColors(colorSet.getPrimaryTextColor(), colorSet.getPrimaryTextColorTinted());
         }
-
         if (repeatButton != null) {
             repeatButton.invalidateColors(colorSet.getPrimaryTextColor(), colorSet.getPrimaryTextColorTinted());
         }
-
         if (prevButton != null) {
             prevButton.invalidateColors(colorSet.getPrimaryTextColor());
         }
-
         if (nextButton != null) {
             nextButton.invalidateColors(colorSet.getPrimaryTextColor());
         }
-
         if (playPauseView != null) {
             playPauseView.setDrawableColor(colorSet.getPrimaryTextColor());
         }
-
-        this.colorSet = colorSet;
     }
 
     @Override
@@ -589,14 +591,13 @@ public class PlayerFragment extends BaseFragment implements
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         if (!SongMenuUtils.INSTANCE.getSongMenuClickListener(mediaManager.getSong(), presenter).onMenuItemClick(item)) {
-            switch (item.getItemId()) {
-                case R.id.favorite:
-                    ((FavoriteActionBarView) item.getActionView()).toggle();
-                    presenter.toggleFavorite();
-                    return true;
-                case R.id.lyrics:
-                    presenter.showLyrics();
-                    return true;
+            if (item.getItemId() == R.id.favorite) {
+                ((FavoriteActionBarView) item.getActionView()).toggle();
+                presenter.toggleFavorite();
+                return true;
+            } else if (item.getItemId() == R.id.lyrics) {
+                presenter.showLyrics();
+                return true;
             }
         }
 
@@ -609,7 +610,7 @@ public class PlayerFragment extends BaseFragment implements
         colorAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         ArgbEvaluator argbEvaluator = ArgbEvaluator.getInstance();
         colorAnimator.addUpdateListener(animator -> {
-            ColorSet colorSet = new ColorSet(
+            ColorSet animateColorSet = new ColorSet(
                     (int) argbEvaluator.evaluate(animator.getAnimatedFraction(), from.getPrimaryColor(), to.getPrimaryColor()),
                     (int) argbEvaluator.evaluate(animator.getAnimatedFraction(), from.getAccentColor(), to.getAccentColor()),
                     (int) argbEvaluator.evaluate(animator.getAnimatedFraction(), from.getPrimaryTextColorTinted(), to.getPrimaryTextColorTinted()),
@@ -691,7 +692,7 @@ public class PlayerFragment extends BaseFragment implements
             getAestheticColorSetDisposable()
                     .take(1)
                     .subscribe(
-                            colorSet -> animateColors(PlayerFragment.this.colorSet, colorSet, 800, intermediateColorSet -> invalidateColors(intermediateColorSet), null),
+                            animateColorSet -> animateColors(PlayerFragment.this.animateColorSet, colorSet, 800, intermediateColorSet -> invalidateColors(intermediateColorSet), null),
                             error -> {
                                 // Nothing ot do
                             }
@@ -711,7 +712,7 @@ public class PlayerFragment extends BaseFragment implements
 
     @Override
     public void presentCreatePlaylistDialog(@NotNull List<? extends Song> songs) {
-
+        // This is not supported in the player screen, so we do nothing.
     }
 
     @Override
@@ -721,12 +722,12 @@ public class PlayerFragment extends BaseFragment implements
 
     @Override
     public void onSongsAddedToPlaylist(@NotNull Playlist playlist, int numSongs) {
-
+        // This is not supported in the player screen, so we do nothing.
     }
 
     @Override
     public void onSongsAddedToQueue(int numSongs) {
-
+        // This is not supported in the player screen, so we do nothing.
     }
 
     @Override
@@ -736,7 +737,7 @@ public class PlayerFragment extends BaseFragment implements
 
     @Override
     public void presentDeleteDialog(@NotNull List<? extends Song> songs) {
-
+        // This is not supported in the player screen, so we do nothing.
     }
 
     @Override

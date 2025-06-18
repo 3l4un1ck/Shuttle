@@ -343,13 +343,10 @@ public class FolderFragment extends BaseFragment implements
                 break;
         }
 
-        switch (settingsManager.getFolderBrowserFoldersSortOrder()) {
-            case SortManager.SortFolders.DEFAULT:
-                menu.findItem(R.id.sort_folder_default).setChecked(true);
-                break;
-            case SortManager.SortFolders.COUNT:
-                menu.findItem(R.id.sort_folder_count).setChecked(true);
-                break;
+        if (settingsManager.getFolderBrowserFoldersSortOrder() == SortManager.SortFolders.DEFAULT) {
+            menu.findItem(R.id.sort_folder_default).setChecked(true);
+        } else if (settingsManager.getFolderBrowserFoldersSortOrder() == SortManager.SortFolders.COUNT) {
+            menu.findItem(R.id.sort_folder_count).setChecked(true);
         }
 
         menu.findItem(R.id.folder_home_dir).setIcon(fileBrowser.getHomeDirIcon());
@@ -448,34 +445,53 @@ public class FolderFragment extends BaseFragment implements
     @SuppressLint("CheckResult")
     @Override
     public void onFileObjectClick(int position, FolderView folderView) {
-        if (contextualToolbarHelper != null && !contextualToolbarHelper.handleClick(folderView, folderView.baseFileObject)) {
-            if (folderView.baseFileObject.fileType == FileType.FILE) {
-                FileHelper.getSongList(songsRepository, new File(folderView.baseFileObject.path), false, true)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                songs -> {
-                                    int index = -1;
-                                    for (int i = 0, songsSize = songs.size(); i < songsSize; i++) {
-                                        Song song = songs.get(i);
-                                        if (song.path.contains(folderView.baseFileObject.path)) {
-                                            index = i;
-                                            break;
-                                        }
-                                    }
-                                    mediaManager.playAll(songs, index, true, () -> {
-                                        if (isAdded() && getContext() != null) {
-                                            // Todo: Show playback failed toast
-                                        }
-                                        return Unit.INSTANCE;
-                                    });
-                                },
-                                error -> LogUtils.logException(TAG, "Error playing all", error));
-            } else {
-                changeDir(new File(folderView.baseFileObject.path));
-            }
-        } else if (folderView.baseFileObject.fileType != FileType.FILE) {
+        if (shouldHandleWithContextualToolbar(folderView)) {
+            handleFileObjectClick(folderView);
+        } else if (isDirectory(folderView)) {
             changeDir(new File(folderView.baseFileObject.path));
         }
+    }
+
+    private boolean shouldHandleWithContextualToolbar(FolderView folderView) {
+        return contextualToolbarHelper != null && !contextualToolbarHelper.handleClick(folderView, folderView.baseFileObject);
+    }
+
+    private boolean isDirectory(FolderView folderView) {
+        return folderView.baseFileObject.fileType != FileType.FILE;
+    }
+
+    private void handleFileObjectClick(FolderView folderView) {
+        if (folderView.baseFileObject.fileType == FileType.FILE) {
+            playFile(folderView);
+        } else {
+            changeDir(new File(folderView.baseFileObject.path));
+        }
+    }
+
+    private void playFile(FolderView folderView) {
+        FileHelper.getSongList(songsRepository, new File(folderView.baseFileObject.path), false, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        songs -> {
+                            int index = findSongIndex(songs, folderView.baseFileObject.path);
+                            mediaManager.playAll(songs, index, true, () -> {
+                                if (isAdded() && getContext() != null) {
+                                    // Show playback failed toast
+                                    Toast.makeText(getContext(), R.string.emptyplaylist, Toast.LENGTH_SHORT).show();
+                                }
+                                return Unit.INSTANCE;
+                            });
+                        },
+                        error -> LogUtils.logException(TAG, "Error playing all", error));
+    }
+
+    private int findSongIndex(List<Song> songs, String path) {
+        for (int i = 0, size = songs.size(); i < size; i++) {
+            if (songs.get(i).path.contains(path)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -488,7 +504,7 @@ public class FolderFragment extends BaseFragment implements
 
     @Override
     public void onFileObjectCheckboxClick(CheckBox checkBox, FolderView folderView) {
-
+        // This method is called when the checkbox in a FolderView is clicked.
     }
 
     public void changeBreadcrumbPath() {
@@ -534,13 +550,12 @@ public class FolderFragment extends BaseFragment implements
             contextualToolbarHelper.setCanChangeTitle(false);
 
             contextualToolbar.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()) {
-                    case R.id.done:
-                        contextualToolbarHelper.finish();
-                        showWhitelist(false);
-                        showBlacklist(false);
-                        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
-                        return true;
+                if (menuItem.getItemId() == R.id.done) {
+                    contextualToolbarHelper.finish();
+                    showWhitelist(false);
+                    showBlacklist(false);
+                    adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+                    return true;
                 }
                 return false;
             });
@@ -553,7 +568,7 @@ public class FolderFragment extends BaseFragment implements
             isShowingBlacklist = false;
         }
         Stream.of(adapter.items)
-                .filter(viewModel -> viewModel instanceof FolderView)
+                .filter(FolderView.class::isInstance)
                 .forEach(viewModel -> ((FolderView) viewModel).setShowWhitelist(show));
         adapter.notifyItemRangeChanged(0, adapter.getItemCount(), 0);
         contextualToolbar.setTitle(R.string.whitelist_title);
@@ -565,7 +580,7 @@ public class FolderFragment extends BaseFragment implements
             isShowingWhitelist = false;
         }
         Stream.of(adapter.items)
-                .filter(viewModel -> viewModel instanceof FolderView)
+                .filter(FolderView.class::isInstance)
                 .forEach(viewModel -> ((FolderView) viewModel).setShowBlacklist(show));
         adapter.notifyItemRangeChanged(0, adapter.getItemCount(), 0);
         contextualToolbar.setTitle(R.string.blacklist_title);
@@ -666,8 +681,7 @@ public class FolderFragment extends BaseFragment implements
 
         @Override
         public void onPlaybackFailed() {
-            // Todo: Improve error message
-            Toast.makeText(getContext(), R.string.emptyplaylist, Toast.LENGTH_SHORT).show();
+           Toast.makeText(getContext(), R.string.playback_failed, Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -704,7 +718,7 @@ public class FolderFragment extends BaseFragment implements
 
         @Override
         public void onPlaylistItemsInserted() {
-
+            // No action needed here, handled by PlaylistMenuHelper
         }
 
         @Override
