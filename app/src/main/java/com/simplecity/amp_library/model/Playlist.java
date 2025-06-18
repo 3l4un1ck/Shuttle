@@ -28,13 +28,13 @@ public class Playlist implements Serializable {
     @Type
     public int type;
 
-    public long id;
-    public String name;
-    public boolean canEdit = true;
-    public boolean canClear = false;
-    public boolean canDelete = true;
-    public boolean canRename = true;
-    public boolean canSort = true;
+    private long id;
+    private String name;
+    private boolean canEdit = true;
+    private boolean canClear = false;
+    private boolean canDelete = true;
+    private boolean canRename = true;
+    private boolean canSort = true;
 
     // These are the Playlist rows that we will retrieve.
     public static final String[] PROJECTION = new String[] {
@@ -86,6 +86,8 @@ public class Playlist implements Serializable {
             case Playlist.Type.USER_CREATED:
                 playlistManager.clearPlaylist(id);
                 break;
+            default:
+                // For other types, we do not allow clearing.
         }
     }
 

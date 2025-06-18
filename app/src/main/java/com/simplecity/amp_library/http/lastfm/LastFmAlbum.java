@@ -11,10 +11,8 @@ public class LastFmAlbum implements LastFmResult {
     public Album album;
 
     public static class Album {
-        public String name;
         @SerializedName("image")
         public List<LastFmImage> images = new ArrayList<>();
-        public Wiki wiki;
     }
 
     @Override
@@ -24,9 +22,5 @@ public class LastFmAlbum implements LastFmResult {
         } else {
             return null;
         }
-    }
-
-    public static class Wiki {
-        public String summary;
     }
 }

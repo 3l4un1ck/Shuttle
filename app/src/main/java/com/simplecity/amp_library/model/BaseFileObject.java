@@ -7,9 +7,9 @@ import java.io.Serializable;
 
 public class BaseFileObject implements Serializable {
 
-    public String name;
-    public String path;
-    public long size;
+    private String name;
+    private String path;
+    private long size;
 
     @FileType
     public int fileType;

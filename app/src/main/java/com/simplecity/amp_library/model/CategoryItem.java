@@ -32,9 +32,9 @@ public class CategoryItem {
     @Type
     public int type;
 
-    public int sortOrder;
+    private int sortOrder;
 
-    public boolean isChecked;
+    private boolean isChecked;
 
     private CategoryItem(@Type int type, SharedPreferences sharedPreferences) {
         this.type = type;
@@ -78,6 +78,8 @@ public class CategoryItem {
                 return R.string.folders_title;
             case Type.PLAYLISTS:
                 return R.string.playlists_title;
+            default:
+                throw new IllegalArgumentException("Unknown category type: " + type);
         }
         return -1;
     }
@@ -98,6 +100,8 @@ public class CategoryItem {
                 return "folders";
             case Type.PLAYLISTS:
                 return "playlists";
+            default:
+                throw new IllegalArgumentException("Unknown category type: " + type);
         }
         return null;
     }
@@ -118,6 +122,8 @@ public class CategoryItem {
                 return false;
             case Type.PLAYLISTS:
                 return false;
+            default:
+                throw new IllegalArgumentException("Unknown category type: " + type);
         }
         return true;
     }
@@ -146,6 +152,8 @@ public class CategoryItem {
                 return FolderFragment.newInstance(context.getString(getTitleResId()), true);
             case Type.PLAYLISTS:
                 return PlaylistListFragment.Companion.newInstance(context.getString(getTitleResId()));
+            default:
+                throw new IllegalArgumentException("Unknown category type: " + type);
         }
         return null;
     }

@@ -6,9 +6,9 @@ import java.io.Serializable;
 
 public class Genre implements Serializable {
 
-    public long id;
-    public String name;
-    public int numSongs;
+    private long id;
+    private String name;
+    private int numSongs;
 
     public static String[] getProjection() {
         return new String[] {

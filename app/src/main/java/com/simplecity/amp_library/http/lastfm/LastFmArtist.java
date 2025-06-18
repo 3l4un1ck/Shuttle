@@ -11,10 +11,8 @@ public class LastFmArtist implements LastFmResult {
     public Artist artist;
 
     public static class Artist {
-        public String name;
         @SerializedName("image")
         public List<LastFmImage> images = new ArrayList<>();
-        public Bio bio;
     }
 
     @Override
@@ -23,9 +21,5 @@ public class LastFmArtist implements LastFmResult {
             return null;
         }
         return LastFmUtils.getBestImageUrl(artist.images);
-    }
-
-    public static class Bio {
-        public String summary;
     }
 }

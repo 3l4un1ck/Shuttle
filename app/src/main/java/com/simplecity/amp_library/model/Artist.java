@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 public class Artist implements Serializable {
 
-    public long id;
-    public String name;
-    public int numAlbums;
-    public int numSongs;
+    private long id;
+    private String name;
+    private int numAlbums;
+    private int numSongs;
 
     public Artist(long id, String name) {
         this.id = id;
